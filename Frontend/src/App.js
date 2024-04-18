@@ -16,6 +16,9 @@ import ChangePassword from './components/ProfileScreens/ChangePassword';
 import NotFound from './components/GeneralScreens/NotFound';
 import EditStory from './components/StoryScreens/EditStory';
 import ReadListPage from './components/ProfileScreens/ReadListPage';
+import Ranking from './components/RankBlog/Ranking'
+import RankingButton from './components/RankBlog/RankingButton';
+
 
 const App = () => {
 
@@ -32,12 +35,15 @@ const App = () => {
                                     <Route exact path='/' element={<PrivateRoute />}>
                                           <Route exact path='/' element={<Home />} />
                                     </Route>
+                                         
+                                    
 
                                     <Route exact path="/story/:slug" element={<DetailStory />} />
 
                                     <Route exact path='/addstory' element={<PrivateRoute />}>
                                           <Route exact path='/addstory' element={<AddStory />} />
                                     </Route>
+                              
 
                                     <Route exact path='/profile' element={<PrivateRoute />}>
                                           <Route exact path='/profile' element={<Profile />} />
