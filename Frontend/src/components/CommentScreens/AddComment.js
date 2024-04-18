@@ -6,6 +6,7 @@ import { IoAdd } from 'react-icons/io5'
 import { useNavigate } from 'react-router-dom';
 import '../../Css/AddComment.css'
 
+
 const AddComment = ({ setSidebarShowStatus, slug, getStoryComments, activeUser, count }) => {
 
     const navigate = useNavigate();
@@ -61,7 +62,32 @@ const AddComment = ({ setSidebarShowStatus, slug, getStoryComments, activeUser, 
         setContent('')
         textareaRef.current.textContent = ''
 
+        
     }
+    const fetchAICommentSuggestion = async () => {
+        try {
+            const response = await axios.get(`/api/comment/${slug}/aiSuggestion`, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+                }
+            });
+            if (response.data && response.data.suggestion) {
+                setContent(response.data.suggestion);
+            }
+        } catch (err) {
+            console.error('Error fetching AI suggestion:', err);
+            setError(err.response && err.response.data.message ? err.response.data.message : 'An error occurred while fetching AI suggestions');
+        }
+    };
+    
+    const fetchCommentSuggestion = async () => {
+        try {
+            const response = await axios.get(`/api/comment/${slug}/aiSuggestion`);
+            setContent(response.data.suggestion);
+        } catch (err) {
+            console.error('Error fetching AI suggestion:', err);
+        }
+    };
 
 
     return (
@@ -116,15 +142,12 @@ const AddComment = ({ setSidebarShowStatus, slug, getStoryComments, activeUser, 
                         <StarRating setStar={setStar} setStarCurrentVal={setStarCurrentVal} starCurrentVal={starCurrentVal} />
 
                         <div className="formBtn-wrapper">
-                            <button type='button'
-                                className='cancel-Btn'
-                                onClick={() => setShowStatus(!showStatus)}
-                            >Cancel </button>
-                            <button type='submit' className={content === '' ? 'respond-Btn disable' : 'respond-Btn'}
-                                disabled={content === '' ? true : false}
-                            >Respond </button>
+                        <button type='button' className='ai-suggestion-btn' onClick={fetchAICommentSuggestion}>Get AI Suggestion</button>
+                        <button type='button' className='cancel-Btn' onClick={() => setSidebarShowStatus(false)}>Cancel</button>
+                        <button type='submit' className='respond-Btn' disabled={!content.trim()}>Respond</button>
+</div>
+{error && <div className="alert-error-message">{error}</div>}
 
-                        </div>
                     </div>
 
                 </form>
