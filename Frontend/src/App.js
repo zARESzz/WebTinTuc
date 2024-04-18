@@ -17,6 +17,7 @@ import NotFound from './components/GeneralScreens/NotFound';
 import EditStory from './components/StoryScreens/EditStory';
 import ReadListPage from './components/ProfileScreens/ReadListPage';
 
+
 const App = () => {
 
       return (
@@ -41,6 +42,10 @@ const App = () => {
 
                                     <Route exact path='/profile' element={<PrivateRoute />}>
                                           <Route exact path='/profile' element={<Profile />} />
+                                    </Route>
+
+                                    <Route exact path='/admin' element={<PrivateRoute />}>
+                                          <Route exact path='/admin' element={<home />} />
                                     </Route>
 
                                     <Route exact path='/edit_profile' element={<PrivateRoute />}>
