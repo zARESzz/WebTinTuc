@@ -1,6 +1,8 @@
 const asyncErrorWrapper = require("express-async-handler")
 const Story = require("../Models/story");
 const Comment = require("../Models/comment");
+const axios = require('axios');
+
 
 const addNewCommentToStory  =asyncErrorWrapper(async(req,res,next)=> {
 
@@ -30,6 +32,55 @@ const addNewCommentToStory  =asyncErrorWrapper(async(req,res,next)=> {
     })
 
 })
+
+const getAICommentSuggestion = asyncErrorWrapper(async(req, res, next) => {
+    const { slug } = req.params;
+    const story = await Story.findOne({slug: slug});
+    if (!story) {
+        return res.status(404).json({ success: false, message: "Story not found" });
+    }
+
+    // Gọi API AI để nhận gợi ý bình luận
+    const aiResponse = await axios.post('https://api.openai.com/v1/engines/gpt-4/completions', {
+        prompt: "Write a thoughtful comment based on the following story: " + story.content,
+        max_tokens: 50
+    }, {
+        headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        }
+    });
+
+    const commentSuggestion = aiResponse.data.choices[0].text.trim();
+
+    return res.status(200).json({
+        success: true,
+        suggestion: commentSuggestion
+    });
+});
+const fetchAICommentSuggestion = async () => {
+    try {
+        const aiResponse = await axios.post('https://api.openai.com/v1/engines/gpt-4/completions', {
+            prompt: "Write a thoughtful comment based on the following story: " + story.content,
+            max_tokens: 50
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+            }
+        });
+    
+        const commentSuggestion = aiResponse.data.choices[0].text.trim();
+    
+        return res.status(200).json({
+            success: true,
+            suggestion: commentSuggestion
+        });
+    } catch (error) {
+        console.error('Error calling OpenAI:', error);
+        return res.status(500).json({ success: false, message: 'Error fetching AI suggestion' });
+    }
+    
+};
+
 
 
 const getAllCommentByStory = asyncErrorWrapper(async(req, res, next) => {
@@ -109,5 +160,7 @@ module.exports ={
     addNewCommentToStory,
     getAllCommentByStory,
     commentLike,
-    getCommentLikeStatus
+    getCommentLikeStatus,
+    getAICommentSuggestion,
+    fetchAICommentSuggestion
 }
